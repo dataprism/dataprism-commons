@@ -10,7 +10,7 @@ type ConsulStorage struct {
 	client *api.KV
 }
 
-func NewStorage(client api.Client) *ConsulStorage {
+func NewStorage(client *api.Client) *ConsulStorage {
 	return &ConsulStorage{client: client.KV()}
 }
 
