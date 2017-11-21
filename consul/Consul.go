@@ -4,23 +4,28 @@ import (
 	"strings"
 	"golang.org/x/net/context"
 	"github.com/hashicorp/consul/api"
-	"encoding/json"
 	"github.com/sirupsen/logrus"
+	"reflect"
 )
 
 type ConsulStorage struct {
 	client *api.KV
 }
 
+type Pair struct {
+	Key string
+	Value []byte
+}
+
 func NewStorage(client *api.Client) *ConsulStorage {
 	return &ConsulStorage{client: client.KV()}
 }
 
-func (s *ConsulStorage) List(ctx context.Context, prefix string, fields []string) ([]map[string]interface{}, error) {
+func (s *ConsulStorage) List(ctx context.Context, prefix string) ([]*Pair, error) {
 	prefix = strings.TrimPrefix(prefix,"/")
 	if ! strings.HasSuffix(prefix, "/") { prefix += "/" }
 
-	var res []map[string]interface{}
+	var res []*Pair
 
 	pairs, _, err := s.client.List(prefix, &api.QueryOptions{})
 	if err != nil {
@@ -32,13 +37,8 @@ func (s *ConsulStorage) List(ctx context.Context, prefix string, fields []string
 
 				if idx != -1 { continue }
 
-				var data map[string]interface{}
-				err := json.Unmarshal(p.Value, &data)
-				if err != nil {
-					logrus.Error(err)
-				} else {
-					res = append(res, data)
-				}
+				p := &Pair{p.Key, p.Value}
+				res = append(res, p)
 			}
 		}
 
@@ -46,15 +46,16 @@ func (s *ConsulStorage) List(ctx context.Context, prefix string, fields []string
 	}
 }
 
-func (s *ConsulStorage) Get(ctx context.Context, key string) ([]byte, error) {
+func (s *ConsulStorage) Get(ctx context.Context, key string) (*Pair, error) {
 	key = strings.TrimPrefix(key,"/")
 
+	logrus.Info(reflect.TypeOf(key))
 	data, _, err := s.client.Get(key, &api.QueryOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	return data.Value, nil
+	return &Pair{data.Key, data.Value}, nil
 }
 
 func (m *ConsulStorage) Set(ctx context.Context, key string, value []byte) (error) {
