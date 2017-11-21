@@ -4,6 +4,8 @@ import (
 	"strings"
 	"golang.org/x/net/context"
 	"github.com/hashicorp/consul/api"
+	"encoding/json"
+	"github.com/sirupsen/logrus"
 )
 
 type ConsulStorage struct {
@@ -14,33 +16,30 @@ func NewStorage(client *api.Client) *ConsulStorage {
 	return &ConsulStorage{client: client.KV()}
 }
 
-func (s *ConsulStorage) List(ctx context.Context, prefix string) ([]string, error) {
+func (s *ConsulStorage) List(ctx context.Context, prefix string, fields []string) ([]map[string]interface{}, error) {
 	prefix = strings.TrimPrefix(prefix,"/")
 	if ! strings.HasSuffix(prefix, "/") { prefix += "/" }
 
-	pairs, _, err := s.client.Keys(prefix, "/", &api.QueryOptions{})
+	var res []map[string]interface{}
+
+	pairs, _, err := s.client.List(prefix, &api.QueryOptions{})
 	if err != nil {
 		return nil, err
 	} else {
-		if pairs == nil {
-			return []string{}, nil
-		}
+		if pairs != nil {
+			for _, p := range pairs {
+				idx := strings.Index(p.Key[len(prefix):], "/")
 
-		var res []string
-		for _, p := range pairs {
-			idx := strings.Index(p, "/")
+				if idx != -1 { continue }
 
-			if idx == -1 {
-				continue
+				var data map[string]interface{}
+				err := json.Unmarshal(p.Value, &data)
+				if err != nil {
+					logrus.Error(err)
+				} else {
+					res = append(res, data)
+				}
 			}
-
-			idx2 := strings.Index(p[idx + 1:], "/")
-
-			if idx2 == -1 {
-				idx2 = len(p[idx + 1:])
-			}
-
-			res = append(res, p[idx + 1:][:idx2])
 		}
 
 		return res, nil
