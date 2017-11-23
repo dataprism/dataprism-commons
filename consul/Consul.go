@@ -37,8 +37,8 @@ func (s *ConsulStorage) List(ctx context.Context, prefix string) ([]*Pair, error
 
 				if idx != -1 { continue }
 
-				p := &Pair{p.Key, p.Value}
-				res = append(res, p)
+				pair := &Pair{p.Key, p.Value}
+				res = append(res, pair)
 			}
 		}
 
