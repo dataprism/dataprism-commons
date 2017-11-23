@@ -34,9 +34,11 @@ func (s *ConsulStorage) List(ctx context.Context, prefix string) ([]*Pair, error
 	} else {
 		if pairs != nil {
 			for _, p := range pairs {
-				idx := strings.Index(p.Key[len(prefix):], "/")
+				parts := strings.Split(p.Key[len(prefix):], "/");
 
-				if idx == -1 { continue }
+				if len(parts) > 2 { continue; }
+
+				if len(parts) == 2 && parts[len(parts) - 1 ] != "definition" { continue; }
 
 				pair := &Pair{p.Key, p.Value}
 				res = append(res, pair)
