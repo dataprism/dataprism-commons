@@ -35,7 +35,7 @@ func (s *ConsulStorage) List(ctx context.Context, prefix string) ([]*Pair, error
 			for _, p := range pairs {
 				idx := strings.Index(p.Key[len(prefix):], "/")
 
-				if idx != -1 { continue }
+				if idx == -1 { continue }
 
 				pair := &Pair{p.Key, p.Value}
 				res = append(res, pair)
