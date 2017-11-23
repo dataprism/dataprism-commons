@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/consul/api"
 	"github.com/sirupsen/logrus"
 	"reflect"
+	"errors"
 )
 
 type ConsulStorage struct {
@@ -53,6 +54,10 @@ func (s *ConsulStorage) Get(ctx context.Context, key string) (*Pair, error) {
 	data, _, err := s.client.Get(key, &api.QueryOptions{})
 	if err != nil {
 		return nil, err
+	}
+
+	if data == nil {
+		return nil, errors.New("requested key returned empty")
 	}
 
 	return &Pair{data.Key, data.Value}, nil
