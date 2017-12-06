@@ -24,9 +24,14 @@ func (m *NodeManager) List() ([]*NodeSummary, error) {
 	res := make([]*NodeSummary, len(nodes))
 	for i, v := range nodes {
 		res[i] = &NodeSummary{
-			Status: v.Status,
 			Id: v.ID,
 			Name: v.Name,
+			Status: v.Status,
+			Version: v.Version,
+			Datacenter: v.Datacenter,
+			Drain: v.Drain,
+			NodeClass: v.NodeClass,
+			StatusDescription: v.StatusDescription,
 		}
 	}
 
@@ -44,6 +49,15 @@ func (m *NodeManager) Get(nodeId string) (*Node, error) {
 		Id: node.ID,
 		Name: node.Name,
 		Attributes: node.Attributes,
+		StatusDescription: node.StatusDescription,
+		NodeClass: node.NodeClass,
+		Drain: node.Drain,
+		Datacenter: node.Datacenter,
+		HTTPAddr: node.HTTPAddr,
+		Links: node.Links,
+		Meta: node.Meta,
+		Status: node.Status,
+		TLSEnabled: node.TLSEnabled,
 		Resources: &NodeResources{
 			CPU: node.Resources.CPU,
 			Disk: node.Resources.DiskMB,
