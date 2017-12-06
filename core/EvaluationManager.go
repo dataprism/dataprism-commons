@@ -1,4 +1,4 @@
-package evaluations
+package core
 
 import (
 	nomad "github.com/hashicorp/nomad/api"
@@ -6,7 +6,7 @@ import (
 )
 
 type EvaluationManager struct {
-	nomadClient *nomad.Client
+	platform *Platform
 }
 
 type JobListResult struct {
@@ -18,14 +18,14 @@ type JobListResult struct {
 	SubmitTime int64 `json:"timestamp"`
 }
 
-func NewManager(nomadClient *nomad.Client) *EvaluationManager {
+func NewEvaluationManager(platform *Platform) *EvaluationManager {
 	return &EvaluationManager{
-		nomadClient: nomadClient,
+		platform: platform,
 	}
 }
 
 func (m *EvaluationManager) Get(evaluationId string) (*Evaluation, error) {
-	eval, _, err := m.nomadClient.Evaluations().Info(evaluationId, &nomad.QueryOptions{})
+	eval, _, err := m.platform.nomadClient.Evaluations().Info(evaluationId, &nomad.QueryOptions{})
 
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (m *EvaluationManager) Get(evaluationId string) (*Evaluation, error) {
 }
 
 func (m *EvaluationManager) Events(evaluationId string) (map[string]NodeAllocationState, error) {
-	list, _, err := m.nomadClient.Evaluations().Allocations(evaluationId, &nomad.QueryOptions{})
+	list, _, err := m.platform.nomadClient.Evaluations().Allocations(evaluationId, &nomad.QueryOptions{})
 
 	if err != nil {
 		return nil, err

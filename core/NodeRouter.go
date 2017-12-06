@@ -1,4 +1,4 @@
-package nodes
+package core
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ type NodeRouter struct {
 	manager *NodeManager
 }
 
-func NewRouter(manager *NodeManager) (*NodeRouter) {
+func NewNodeRouter(manager *NodeManager) (*NodeRouter) {
 	return &NodeRouter{manager:manager}
 }
 

@@ -1,4 +1,4 @@
-package evaluations
+package core
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ type EvaluationRouter struct {
 	manager *EvaluationManager
 }
 
-func NewRouter(manager *EvaluationManager) (*EvaluationRouter) {
+func NewEvaluationRouter(manager *EvaluationManager) (*EvaluationRouter) {
 	return &EvaluationRouter{manager:manager}
 }
 

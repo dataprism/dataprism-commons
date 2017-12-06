@@ -1,4 +1,4 @@
-package nodes
+package core
 
 type NodeSummary struct {
 	Id       string `json:"id"`

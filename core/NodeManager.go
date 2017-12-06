@@ -1,21 +1,21 @@
-package nodes
+package core
 
 import (
 	nomad "github.com/hashicorp/nomad/api"
 )
 
 type NodeManager struct {
-	nomadClient *nomad.Client
+	platform *Platform
 }
 
-func NewManager(nomadClient *nomad.Client) *NodeManager {
+func NewNodeManager(platform *Platform) *NodeManager {
 	return &NodeManager{
-		nomadClient: nomadClient,
+		platform: platform,
 	}
 }
 
 func (m *NodeManager) List() ([]*NodeSummary, error) {
-	nodes, _, err := m.nomadClient.Nodes().List(&nomad.QueryOptions{})
+	nodes, _, err := m.platform.nomadClient.Nodes().List(&nomad.QueryOptions{})
 
 	if err != nil {
 		return nil, err
@@ -30,13 +30,11 @@ func (m *NodeManager) List() ([]*NodeSummary, error) {
 		}
 	}
 
-
-
 	return res, nil
 }
 
 func (m *NodeManager) Get(nodeId string) (*Node, error) {
-	node, _, err := m.nomadClient.Nodes().Info(nodeId, &nomad.QueryOptions{})
+	node, _, err := m.platform.nomadClient.Nodes().Info(nodeId, &nomad.QueryOptions{})
 
 	if err != nil {
 		return nil, err

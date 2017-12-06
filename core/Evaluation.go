@@ -1,4 +1,4 @@
-package evaluations
+package core
 
 type Evaluation struct {
 	Id           string `json:"id"`

@@ -12,6 +12,9 @@ type Platform struct {
 	Settings *config.Configuration
 	KV *storage.ConsulStorage
 	Scheduler *execute.NomadScheduler
+
+	consulClient *consul.Client
+	nomadClient *nomad.Client
 }
 
 func InitializePlatform() (*Platform, error) {
@@ -37,5 +40,9 @@ func InitializePlatform() (*Platform, error) {
 		Settings: settings,
 		KV: store,
 		Scheduler: scheduler,
+		consulClient: consulClient,
+		nomadClient: nomadClient,
 	}, nil
 }
+
+
