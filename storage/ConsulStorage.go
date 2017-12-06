@@ -4,6 +4,7 @@ import (
 	"strings"
 	"golang.org/x/net/context"
 	"github.com/hashicorp/consul/api"
+	"errors"
 )
 
 type ConsulStorage struct {
