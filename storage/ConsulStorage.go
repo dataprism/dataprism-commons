@@ -1,11 +1,9 @@
-package consul
+package storage
 
 import (
 	"strings"
 	"golang.org/x/net/context"
 	"github.com/hashicorp/consul/api"
-	"github.com/sirupsen/logrus"
-	"reflect"
 )
 
 type ConsulStorage struct {
@@ -17,8 +15,8 @@ type Pair struct {
 	Value []byte
 }
 
-func NewStorage(client *api.Client) *ConsulStorage {
-	return &ConsulStorage{client: client.KV()}
+func NewConsulStorage(client *api.KV) *ConsulStorage {
+	return &ConsulStorage{client: client}
 }
 
 func (s *ConsulStorage) List(ctx context.Context, prefix string) ([]*Pair, error) {
@@ -49,10 +47,13 @@ func (s *ConsulStorage) List(ctx context.Context, prefix string) ([]*Pair, error
 func (s *ConsulStorage) Get(ctx context.Context, key string) (*Pair, error) {
 	key = strings.TrimPrefix(key,"/")
 
-	logrus.Info(reflect.TypeOf(key))
 	data, _, err := s.client.Get(key, &api.QueryOptions{})
 	if err != nil {
 		return nil, err
+	}
+
+	if data == nil {
+		return nil, nil
 	}
 
 	return &Pair{data.Key, data.Value}, nil
