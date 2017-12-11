@@ -70,7 +70,14 @@ func (s *NomadScheduler) Unschedule(kind string, id string) (*UnscheduleResponse
 func (m *NomadScheduler) GetJobStatus(kind string, id string) (*DataprismJobStatus, error) {
 	summary, _, err := m.nomad.Jobs().Summary(id, &api.QueryOptions{})
 	if err != nil {
-		return nil, err
+		return &DataprismJobStatus{
+			Complete: 0,
+			Failed:   0,
+			Lost:     0,
+			Queued:   0,
+			Running:  0,
+			Starting: 0,
+		}, nil
 	}
 
 	tgSummary, exists := summary.Summary[kind + "s"]
